@@ -1,0 +1,48 @@
+import keras as ks import numpy as np import pandas as pd
+from sklearn.preprocessing import MinMaxScaler import matplotlib.pyplot as plt import math
+data = pd.read_csv("C:/Users/weeel/Desktop/Data/Stocks/ aapl.us.txt")
+data = data.drop(['Date', 'Volume', 'OpenInt'], 1)
+data = data.to_numpy()
+train_size = int(len(data) * 0.6) test_size = len(data) - train_size
+train,	test	=	data[0:train_size,:],
+data[train_size:len(data),:]
+scaler = MinMaxScaler(feature_range=(-1, 1)) scaler.fit(train)
+data_train = scaler.transform(train) data_test = scaler.transform(test)
+def create_datasetX(dataset, time): dataX = []
+for i in range(len(dataset)-time-1): a = dataset[i:(i+time), :-1] dataX.append(a) return np.array(dataX)
+def create_datasetY(dataset, time): dataY = []
+for i in range(len(dataset)-time-1): a = dataset[i + time, 3] dataY.append(a) return np.array(dataY)
+window = 10
+trainX = create_datasetX(data_train, window)
+trainY = create_datasetY(data_train, window)
+testX = create_datasetX(data_test, window)
+testY = create_datasetY(data_test, window)
+activation_f = 'relu'
+model = ks.models.Sequential()
+model.add(ks.layers.Flatten())
+model.add(ks.layers.Dense(1024,
+activation=activation_f))
+model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(512,
+activation=activation_f))
+model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(256,
+activation=activation_f))
+model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(128,
+activation=activation_f))
+model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(64, activation=activation_f)) model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(1, activation=activation_f))
+model.compile(optimizer="adam",
+loss="mean_squared_error")
+fit = model.fit(trainX,	trainY,	epochs=10, 
+batch_size=64, verbose=1, shuffle=True)
+trainScore = model.evaluate(trainX, trainY, verbose=1)
+print('Train Score:	%.2f MSE (%.2f RMSE)' %
+(trainScore, math.sqrt(trainScore)))
+testScore = model.evaluate(testX, testY, verbose=1)
+print('Test Score:	%.2f MSE (%.2f RMSE)' % (testScore,
+math.sqrt(testScore)))
+trainPredict = model.predict(trainX) testPredict = model.predict(testX)
+plt.plot(data_test, color='blue') plt.plot(testPredict, color='red') plt.show()
