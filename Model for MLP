@@ -1,0 +1,11 @@
+activation_f = 'relu'
+model = ks.models.Sequential() 
+model.add(ks.layers.Flatten())
+model.add(ks.layers.Dense(1024, activation=activation_f)) model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(512, activation=activation_f)) model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(256, activation=activation_f)) model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(128, activation=activation_f)) model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(64, activation=activation_f)) model.add(ks.layers.Dropout(0.1))
+model.add(ks.layers.Dense(1, activation=activation_f))
+model.compile(optimizer="adam", loss="mean_squared_error")
+fit = model.fit(trainX, trainY, epochs=10, batch_size=64, verbose=1, shuffle=True)
