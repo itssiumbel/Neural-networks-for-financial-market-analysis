@@ -1,0 +1,18 @@
+data = data.drop(['Date', 'Volume', 'OpenInt'], 1)
+#DataFrame -> NumPy array:
+data = data.to_numpy()
+# split data to the train and test samples
+train_size = int(len(data) * 0.6) test_size = len(data) - train_size
+train, test = data[0:train_size,:], data[train_size:len(data),:] 
+
+scaler = MinMaxScaler(feature_range=(-1, 1)) scaler.fit(train)
+data_train = scaler.transform(train) data_test = scaler.transform(test) data1 = scaler.transform(data)
+#used "window" for time prediction 
+window = 10
+trainX = create_datasetX(data_train, window) trainY = create_datasetY(data_train, window) testX = create_datasetX(data_test, window) testY = create_datasetY(data_test, window)
+# creation data arrays function
+def create_datasetX(dataset, time): dataX = []
+for i in range(len(dataset)-time-1):
+a = dataset[i:(i+time), :-1] dataX.append(a) return np.array(dataX)
+def create_datasetY(dataset, time): dataY = []
+for i in range(len(dataset)-time-1): a = dataset[i + time, 3] dataY.append(a) return np.array(dataY)
